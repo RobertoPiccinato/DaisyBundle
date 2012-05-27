@@ -1,0 +1,18 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+
+class DaisyPublisherContextualized extends DaisyXMLNode {
+	
+	public function __construct(DOMElement & $node, $value = true) {
+		parent::__construct($node, "p:contextualized", PUBLISHER_NAMESPACE);
+		$this->setValue($value);
+	}
+	
+	public function setValue($value = true) {
+		if ($value) parent::setValue('true');
+		else parent::setValue('false');
+	}
+	
+}
+?>

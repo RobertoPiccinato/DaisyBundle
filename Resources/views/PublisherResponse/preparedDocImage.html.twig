@@ -1,0 +1,27 @@
+<h1>{{ source.publisherResponse.document.name }}</h1>
+
+<img src="http://localhost:9263/publisher/blob?
+documentId={{ source.documentId }}&
+branch={{ source.branchId }}&
+language={{ source.languageId }}&
+version={{ source.publisherResponse.document.dataVersionId }}&
+partType=ImagePreview" />
+<br/>
+Parts:
+<dl>
+	{% for part in source.publisherResponse.document.parts %}
+	<li>{{ part.label }}: <a href="http://localhost:9263/publisher/blob?
+						documentId={{ source.documentId }}&
+						branch={{ source.branchId }}&
+						language={{ source.languageId }}&
+						version={{ source.publisherResponse.document.dataVersionId }}&
+						partType={{ part.name }}" />source</a>
+		({{ part.mimeType }} {{ part.size }} bytes);</li>
+	{% end for %}
+</dl>
+Fields:
+<ol>
+	{% for field in source.publisherResponse.document.fields %}
+		<li> {{ field.name }} - {{ field.valueFormatted }}
+	{% end for %}
+</ol>

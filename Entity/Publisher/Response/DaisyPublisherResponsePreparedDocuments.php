@@ -1,0 +1,207 @@
+<?php
+
+namespace Casagrande\DaisyBundle\Entity\Response;
+
+use Casagrande\DaisyBundle\Entity\Exceptions\EDaisyEmptyArgumentSupplied;
+use Casagrande\DaisyBundle\Entity\Response\DaisyPublisherResponseTemplateProcessor;
+
+class DaisyPublisherResponsePreparedDocuments {
+	private $response;
+	private $output;
+	private $templateProcessor;
+	private $templateEngine;
+	private $convertor;
+	
+	public $defaultDocumentTemplate;
+	public $preparedDocumentsTemplate;
+	public $errorTemplate;
+	private $customTemplates = array (
+								'tag' => 'document',
+								'attributeName' => 'typeName',
+								'templates' => array ()											   
+							   );
+
+	public function __construct($response,
+								IDaisyPublisherResponseTemplate $templateEngine,
+								ADaisyPublisherInlinedTagsConvertor $convertor) {
+			$this->templateProcessor = new DaisyPublisherResponseTemplateProcessor();
+			$this->setResponse($response);
+			$this->setTemplateEngine($templateEngine);
+			$this->setConvertor($convertor);
+	}
+	
+	public function setTemplateEngine(IDaisyPublisherResponseTemplate $templateEngine) {		
+		if (empty($templateEngine)) throw new EDaisyEmptyArgumentSupplied(array('templateEngine'));		
+		$this->templateEngine = $templateEngine;
+		$this->templateProcessor->setTemplateEngine($templateEngine);
+	}
+	
+	public function setConvertor(ADaisyPublisherInlinedTagsConvertor $convertor) {
+		if (empty($convertor)) throw new EDaisyEmptyArgumentSupplied(array('convertor'));
+		$this->convertor = $convertor;
+	}
+	
+	public function setResponse($response) {
+		if (empty($response)) throw new EDaisyEmptyArgumentSupplied(array('response'));
+		$this->response = $response;
+		$this->output = array();
+	}
+	
+	public function getResponse() {
+		return $this->output;
+	}
+	
+	public function setCustomTemplate($typeName, $template) {				
+		if (empty($typeName)) throw new EDaisyEmptyArgumentSupplied(array('typeName'));
+		if (empty($template)) throw new EDaisyEmptyArgumentSupplied(array('template'));
+		
+		$this->customTemplates['templates'][$typeName] = $template;
+	}
+	
+	public function removeCustomTemplate($typeName) {
+		if (empty($typeName)) throw new EDaisyEmptyArgumentSupplied(array('typeName'));
+		
+		if (!empty($this->customTemplates['templates'][$typeName]))
+			unset($this->customTemplates['templates'][$typeName]);
+	}
+	
+	public function process() {
+		if ($this->detectError()) {
+			$this->output[] = $this->processError();
+			return $this->output;
+		}
+		
+		$documents = $this->response->xpath('/publisherResponse/document');
+		
+		foreach ($documents as $document) {
+			if (empty($document)) continue;
+			$preparedDocumentsSet = $document->xpath('.//preparedDocuments');
+			$documentBody = array();
+			
+			foreach ($preparedDocumentsSet as $preparedDocuments) {
+				try {
+					$documentBody[] = $this->processPreparedDocuments($preparedDocuments);
+				}
+				catch (EDaisyEmptyArgumentSupplied $e) {
+					$documentBody[] = 'Error processing prepared document. Empty argument '.$e->arguments[0];
+				}
+			}
+			
+			if (empty($this->preparedDocumentsTemplate)) throw new EDaisyEmptyArgumentSupplied(array(__CLASS__.'::preparedDocumentsTemplate'));
+			$this->templateEngine->setTemplate($this->preparedDocumentsTemplate);
+			
+			$this->convertAvailableVariants($document);
+			$this->templateEngine->setSource($document);
+			$this->templateEngine->setCustomVariable('documentBody', $documentBody);
+			
+			$tmp['html'] = $this->templateEngine->process();
+			$tmp['attributes']['documentId'] = (string) $document['documentId'];
+			$tmp['attributes']['branchId'] = (string) $document['branchId'];
+			$tmp['attributes']['languageId'] = (string) $document['languageId'];
+			$tmp['attributes']['branch'] = (string) $document['branch'];
+			$tmp['attributes']['language'] = (string) $document['language'];
+			
+			$this->output[] = $tmp;
+		}
+		return $this->output;
+	}
+	
+	private function detectError() {
+		$error = $this->response->xpath('/error');
+		if (!empty($error)) return true;
+		else return false;
+	}
+	
+	private function processError() {
+		if (empty($this->errorTemplate)) throw new EDaisyEmptyArgumentSupplied(array(__CLASS__.'::errorTemplate'));
+		
+		$this->templateEngine->setTemplate($this->errorTemplate);		
+		$this->templateEngine->setSource($this->response->cause);
+		
+		$tmp['html'] = $this->templateEngine->process();
+		$tmp['attributes']['documentId'] = '';
+		$tmp['attributes']['branchId'] = '';
+		$tmp['attributes']['languageId'] = '';
+		$tmp['attributes']['branch'] = '';
+		$tmp['attributes']['language'] = '';
+		
+		return $tmp;
+	}
+	
+	private function processPreparedDocuments($preparedDocuments) {
+		if (empty($preparedDocuments)) throw new EDaisyEmptyArgumentSupplied(array('preparedDocuments'));
+				
+		$this->templateProcessor->clearTags();
+				
+		if (empty($this->defaultDocumentTemplate)) throw new EDaisyEmptyArgumentSupplied(array(__CLASS__.'::defaultDocumentTemplate'));
+		$this->templateProcessor->setTagTemplate('preparedDocument',
+												 $this->defaultDocumentTemplate,
+												 array('id'),
+												 array(),
+												 $this->customTemplates);
+		$this->templateProcessor->setResponse($preparedDocuments);
+		$result = $this->templateProcessor->process();
+		$result = $result['preparedDocument'];
+		
+		return $this->assembleIncludes($result);
+	}
+	
+	private function assembleIncludes(array $documents) {
+		$includes = array();
+		$assembledDocuments = array();
+		
+		foreach($documents as $document) {
+			$includes[$document['attributes']['id']] = $this->findIncludeTags($document['template']);
+			$assembledDocuments[$document['attributes']['id']] = $document['template'];
+		}
+
+		for ($i = count($assembledDocuments); $i >= 1; $i--) {
+			if (!empty($includes[$i])) {
+				foreach ($includes[$i] as $inclusion)
+					$assembledDocuments[$i] = substr_replace($assembledDocuments[$i],
+															 $assembledDocuments[$inclusion['id']],
+															 $inclusion['start'],
+															 $inclusion['length']);
+			}
+		}
+		
+		return $assembledDocuments[1];
+	}
+	
+	private function findIncludeTags($html) {		
+		$ret = array();
+		$offset = 0;
+		
+		while ((($start = strpos($html, '<daisyPreparedInclude', $offset)) !== FALSE) &&
+			   (($end = strpos($html, '/>', $start)) !== FALSE)) {
+			$tmp = array(
+					'start' => $start,
+					'length' => $end + 2 - $start,
+					'id' => '' 
+					);
+			$offset = $end + 2;
+			
+			if ((($idStart = strpos($html, 'id="', $start)) === FALSE) ||
+				(($idEnd = strpos($html, '"', $idStart + 4)) === FALSE)) {
+					$ret[] = $tmp;
+					continue;
+			}
+			else $tmp['id'] = substr($html, $idStart + 4, $idEnd - $idStart - 4);
+			
+			$ret[] = $tmp;
+		}
+
+		return $ret;
+	}
+	
+	private function convertAvailableVariants(SimpleXMLElement $document) {
+		if (empty($document)) return;
+		$id = $document['documentId'];
+		$variants = $document->xpath('.//availableVariant');
+		foreach ($variants as $variant)
+			$variant['href'] = $this->convertor->getDocumentHref('daisy:'.$id.'@'.$variant['branchId'].':'.$variant['languageId']);
+	}
+	
+}
+
+?> 

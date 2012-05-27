@@ -1,0 +1,63 @@
+<?php
+
+namespace Casagrande\DaisyBundle\Entity\Response;
+
+use Casagrande\DaisyBundle\Entity\Exceptions\EDaisyEmptyArgumentSupplied;
+
+class DaisyPublisherHtmlPart {
+	private $document;
+	
+	public function __construct($xml) {
+		$this->init($xml);
+	}
+	
+	public function init($xml) {
+		if (empty($xml)) throw new EDaisyEmptyArgumentSupplied(array('xml'));
+		if (is_object($xml) && is_a($xml, 'SimpleXMLElement'))
+			$this->document = \DOMDocument::loadXML($xml->asXML);
+		else $this->document = \DOMDocument::loadXML($xml);
+	}
+	
+	public function asSimpleXmlElement(\DOMNode $node = null) {
+		if (is_null($node)) return simplexml_import_dom($this->document);
+		else return simplexml_import_dom($node);
+	}
+	
+	public function asXML(\DOMNode $node = null) {
+		if (is_null($node))	return $this->removeXMLDeclaration($this->document->saveXML());
+		else return $this->removeXMLDeclaration($this->asSimpleXmlElement($node)->asXML());
+	}
+	
+	private function removeXMLDeclaration($xml) {
+		$xml = preg_replace('/(<body>|<\/body>)/', '', $xml);
+		$xml = preg_replace('/(<\?xml(.*?)\?>)/', '', $xml);
+		return $xml;
+	}
+		
+	public function getTagList($tagName) {
+		if (empty($tagName)) throw new EDaisyEmptyArgumentSupplied(array('tagName'));
+		$list = $this->document->getElementsByTagName($tagName);
+		
+		if ($list->length <= 0) throw new EDaisyNoTag($tagName);
+		
+		$tags = array();
+		foreach ($list as $tag)
+			$tags[] = $tag;
+		
+		return $tags;
+	}
+	
+	public function changeTag(\DOMNode $oldNode, $newTagName, $newTagXml) {
+		if (empty($oldNode)) throw new EDaisyEmptyArgumentSupplied(array('oldNode'));
+		if (empty($newTagName)) throw new EDaisyEmptyArgumentSupplied(array('newTagName'));
+		if (empty($newTagXml)) throw new EDaisyEmptyArgumentSupplied(array('newTagXml'));
+		
+		$newDoc = \DOMDocument::LoadXML($newTagXml);
+		if (($newTag = $newDoc->getElementsByTagName($newTagName)->item(0)) == null)
+			throw new EDaisyNoTag($newTagName);
+			
+		$parent = $oldNode->parentNode;
+		$newTagImported = $this->document->importNode($newTag, true);
+		$parent->replaceChild($newTagImported, $oldNode);
+	}
+}

@@ -1,0 +1,16 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'ADaisyPublisherAllRequests.php';
+
+class DaisyPublisherWhen extends ADaisyPublisherAllRequests {
+	protected $attributes = array (
+								'test' => ''
+							);
+
+	public function __construct(DOMElement & $node, $test = '') {
+		parent::__construct($node, "p:when", PUBLISHER_NAMESPACE);
+		$this->test = $test;
+	}
+	
+}
+?>

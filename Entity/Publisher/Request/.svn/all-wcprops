@@ -1,0 +1,131 @@
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request
+END
+DaisyPublisherPreparedDocuments.php
+K 25
+svn:wc:ra_dav:version-url
+V 143
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherPreparedDocuments.php
+END
+DaisyPublisherActivePath.php
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherActivePath.php
+END
+DaisyPublisherRequest.php
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn_public/outerthought_daisy/!svn/ver/3347/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherRequest.php
+END
+DaisyPublisherVersionMode.php
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherVersionMode.php
+END
+DaisyPublisherGroup.php
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn_public/outerthought_daisy/!svn/ver/3347/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherGroup.php
+END
+DaisyPublisherNavigationDocument.php
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherNavigationDocument.php
+END
+DaisyPublisherIf.php
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/svn_public/outerthought_daisy/!svn/ver/3347/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherIf.php
+END
+DaisyPublisherPerformQuery.php
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherPerformQuery.php
+END
+DaisyPublisherWhen.php
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn_public/outerthought_daisy/!svn/ver/3347/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherWhen.php
+END
+DaisyPublisherContextualized.php
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherContextualized.php
+END
+DaisyPublisherQuery.php
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherQuery.php
+END
+DaisyPublisherForEach.php
+K 25
+svn:wc:ra_dav:version-url
+V 133
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherForEach.php
+END
+DaisyPublisherDiff.php
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn_public/outerthought_daisy/!svn/ver/3347/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherDiff.php
+END
+DaisyPublisherOtherwise.php
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherOtherwise.php
+END
+DaisyPublisherActiveDocument.php
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherActiveDocument.php
+END
+DaisyPublisherExtraConditions.php
+K 25
+svn:wc:ra_dav:version-url
+V 141
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherExtraConditions.php
+END
+DaisyPublisherDocument.php
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherDocument.php
+END
+DaisyPublisherResolveDocumentIds.php
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherResolveDocumentIds.php
+END
+DaisyPublisherNavigationTree.php
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherNavigationTree.php
+END
+DaisyPublisherOtherDocument.php
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/svn_public/outerthought_daisy/!svn/ver/3365/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherOtherDocument.php
+END
+DaisyPublisherChoose.php
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/svn_public/outerthought_daisy/!svn/ver/3251/contrib/gsoc2006/kostiantyn/DaisyLib/Classes/Publisher/Request/DaisyPublisherChoose.php
+END

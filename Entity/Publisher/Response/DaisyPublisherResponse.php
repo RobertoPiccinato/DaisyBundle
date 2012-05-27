@@ -1,0 +1,141 @@
+<?php
+
+namespace Casagrande\DaisyBundle\Entity\Response;
+
+use Casagrande\DaisyBundle\Entity\Exceptions\EDaisyEmptyArgumentSupplied;
+use Casagrande\DaisyBundle\Entity\Response\DaisyPublisherHtmlPart;
+
+class DaisyPublisherResponse {
+	public $response;
+	protected $convertor;
+	
+	public function __construct (ADaisyPublisherInlinedTagsConvertor $convertor, $responseXml = '') {		
+		$this->setConvertor($convertor);
+		if (!empty($responseXml)) $this->setResponse($responseXml);		
+	}
+
+	public function setResponse($responseXml) {
+		if (empty($responseXml)) throw new EDaisyEmptyArgumentSupplied(array('responseXml'));
+		if (!empty($this->response)) unset($this->response);
+
+		$this->clearNameSpaces($responseXml);
+		$this->response = simplexml_load_string($responseXml);
+	}
+	
+	public function setConvertor(ADaisyPublisherInlinedTagsConvertor $convertor) {
+		if (empty($convertor)) throw new EDaisyEmptyArgumentSupplied(array('convertor'));
+		$this->convertor = $convertor;
+	}
+		
+	private function clearNameSpaces(&$xml) {
+		preg_match_all('/xmlns:(\w+)=[\'|\"].*?[\'|\"]/', $xml, $nameSpaces);
+
+		$xml = preg_replace('/xmlns:(\w+)=[\'|\"].*?[\'|\"]/','', $xml);
+		$xml = preg_replace('/xmlns=[\'|\"].*?[\'|\"]/','', $xml);
+		
+		if (!empty($nameSpaces[1]))
+			foreach ($nameSpaces[1] as $ns)
+				$xml = preg_replace('/([<|<\/]|\s)'.$ns.':/','$1',$xml);
+		
+		return $xml;
+	}
+	
+	private function extractHtml(\SimpleXMLElement $document) {
+		$parts = $document->xpath('.//part');
+		foreach ($parts as $part)
+			if ((string)$part['daisyHtml'] == 'true') {
+				$html = $part->html->body->asXML();
+				$htmlPart = new DaisyPublisherHtmlPart($html);
+				$this->convertLinks($htmlPart);
+				$this->convertImages($htmlPart);
+				$this->convertSearchResults($htmlPart);
+				$this->convertOtherInlinedTags($htmlPart);
+				$part->html = $htmlPart->asXML();
+			}
+		$this->convertDocumentLinks($document);
+		$this->convertOtherDocumentTags($document);
+	}
+		
+	private function convertLinks(DaisyPublisherHtmlPart $part) {
+		try {
+			$as = $part->getTagList('a');
+		}
+		catch (EDaisyNoTag $e) {
+			return;	
+		}
+		
+		foreach ($as as $a) {
+			$convertedTag = $this->convertor->convertLink($part->asSimpleXmlElement($a));
+			$part->changeTag($a, $convertedTag['tagName'], $convertedTag['html']);
+		}
+	}
+	
+	private function convertImages(DaisyPublisherHtmlPart $part) {
+		try {
+			$imgs = $part->getTagList('img');
+		}
+		catch (EDaisyNoTag $e) {
+			return;	
+		}
+		
+		foreach ($imgs as $img) {
+			$convertedTag = $this->convertor->convertImageLink($part->asSimpleXmlElement($img));
+			$part->changeTag($img, $convertedTag['tagName'], $convertedTag['html']);
+		}
+	}
+	
+	private function convertDocumentLinks(SimpleXMLElement $node) {
+		$links = $node->xpath('.//link');
+		for ($i = 0; $i < count($links); $i++) {
+			if (!empty($links[$i]['target']))
+				$links[$i]['target'] = $this->convertor->getDocumentHref((string) $links[$i]['target']);
+		}
+	}
+	
+	private function convertSearchResults(DaisyPublisherHtmlPart $part) {
+		try {
+			$results = $part->getTagList('searchResult');
+		}
+		catch (EDaisyNoTag $e) {
+			return;	
+		}
+		
+		foreach ($results as $res) {
+			$convertedTag = $this->convertor->convertSearchResults($part->asSimpleXmlElement($res));
+			$part->changeTag($res, $convertedTag['tagName'], $convertedTag['html']);
+		}
+	}
+	
+	private function convertNavigationLinks() {
+		$navigationTree = $this->response->xpath('//navigationTree');
+		for ($i = 0; $i < count($navigationTree); $i++) {
+			$doc = $navigationTree[$i]->xpath('.//doc');
+			for ($j = 0; $j < count($doc); $j++)
+				$doc[$j]['href'] = $this->convertor->getDocumentHref('daisy:'.$doc[$j]['documentId'].'@'.$doc[$j]['branchId'].':'.$doc[$j]['languageId']);
+		}
+	}
+	
+	protected function convertOtherInlinedTags(DaisyPublisherHtmlPart $part){}
+	
+	protected function convertOtherDocumentTags(SimpleXMLElement $document){}
+	
+	public function convertDocuments() {
+		$documents = $this->response->xpath('.//preparedDocument');
+		foreach ($documents as $document) {
+			$this->convertor->setConvertorParameters((string) $document['branchId'],
+													 (string) $document['languageId'],
+													 'live');
+			$this->extractHtml($document);
+		}
+		$this->convertNavigationLinks();
+	}
+	
+	static function processResponse(ADaisyPublisherInlinedTagsConvertor $convertor, $responseXml) {
+		if (empty($responseXml)) throw new EDaisyEmptyArgumentSupplied(array('responseXml'));
+		$response = new DaisyPublisherResponse($convertor, $responseXml);		
+		$response->convertDocuments();
+		return $response->response;
+	}
+}
+
+?>

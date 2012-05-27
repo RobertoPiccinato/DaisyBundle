@@ -1,0 +1,10 @@
+<ul>
+{% for row in rows %}
+	<li>
+	{% for cel in row.cels %}
+		{{ cel }} - 
+	{% endfor %}
+	<a href="http://localhost/DaisyLib/test.php?id={{ row.documentId }}&amp;branch={{ row.branchId }}&amp;language={{ row.languageId }}&amp;version=live">view</a>
+	</li>
+{% endfor %}	
+</ul>

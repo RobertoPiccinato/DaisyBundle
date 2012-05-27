@@ -1,0 +1,18 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+
+class DaisyPublisherExtraConditions extends DaisyXMLNode {
+	
+	public function __construct(DOMElement & $node, $value = '') {
+		parent::__construct($node, "p:extraConditions", PUBLISHER_NAMESPACE);
+		$this->setValue($value);
+	}
+	
+	public function setValue($value = '') {
+		parent::setValue($value);
+	}
+	
+}
+
+?>

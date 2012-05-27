@@ -1,0 +1,32 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherNavigationDocument.php';
+
+class DaisyPublisherPreparedDocuments extends DaisyXMLNode {	
+	public $navigationDocument = null;
+	protected $attributes = array (
+								'publisherRequestSet' => '',
+								'applyDocumentTypeStyling' => ''
+							);
+
+	public function __construct(DOMElement & $node) {
+		parent::__construct($node, "p:preparedDocuments", PUBLISHER_NAMESPACE);
+	}
+	
+	public function addNavigationDocument($id = '', $branch = '', $language = '') {
+		if (!is_null($this->navigationDocument)) {
+			if (!empty($id)) $this->navigationDocument->id = $id;
+			if (!empty($branch)) $this->navigationDocument->branch = $branch;
+			if (!empty($language)) $this->navigationDocument->language = $language;
+			return $this->navigationDocument;
+		}
+		else {
+			 $this->navigationDocument = new DaisyPublisherNavigationDocument($this->node, $id, $branch, $language);
+			 return $this->navigationDocument;
+		}
+	}
+		
+}
+
+?>

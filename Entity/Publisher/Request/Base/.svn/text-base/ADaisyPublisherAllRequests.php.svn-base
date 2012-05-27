@@ -1,0 +1,78 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherNavigationTree.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherPerformQuery.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherForEach.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherResolveDocumentIds.php';
+
+abstract class ADaisyPublisherAllRequests extends DaisyXMLNode {
+	public $document = array();
+	public $navigationTree = array();
+	public $performQuery = array();
+	public $forEach = array();
+	public $if = array();
+	public $choose = array();
+	public $group = array();
+	public $resolveDocumentIds = array();
+	
+	public function addDocument($id = '', $branch = '', $language = '', $version = '', $field = '') {
+		require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherDocument.php';
+		$tmp = new DaisyPublisherDocument($this->node, $id, $branch, $language, $version, $field);
+		$this->document[] = $tmp;
+		return $tmp;
+	}
+	
+	public function addMyComments() {
+		$this->addChild('p:myComments', true, PUBLISHER_NAMESPACE);
+	}
+	
+	public function addNavigationTree() {
+		$tmp = new DaisyPublisherNavigationTree($this->node);
+		$this->navigationTree[] = $tmp;
+		return $tmp;
+	}
+	
+	public function addPerformQuery($query = '') {
+		$tmp = new DaisyPublisherPerformQuery($this->node, $query);
+		$this->performQuery[] = $tmp;
+		return $tmp;		
+	}
+	
+	public function addForEach() {
+		$tmp = new DaisyPublisherForEach($this->node);
+		$this->forEach[] = $tmp;
+		return $tmp;
+	}
+	
+	public function addIf($test = '') {
+		require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherIf.php';
+		$tmp = new DaisyPublisherIf($this->node, $test);
+		$this->if[] = $tmp;
+		return $tmp;
+	}
+	
+	public function addChoose() {
+		require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherChoose.php';
+		$tmp = new DaisyPublisherChoose($this->node);
+		$this->choose[] = $tmp;
+		return $tmp;
+	}
+	
+	public function addGroup($id = '') {
+		require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherGroup.php';
+		$tmp = new DaisyPublisherGroup($this->node, $id);
+		$this->group[] = $tmp;
+		return $tmp;		
+	}
+	
+	public function addResolveDocumentIds($branch = '', $language = '') {
+		$tmp = new DaisyPublisherResolveDocumentIds($this->node, $branch, $language);
+		$this->resolveDocumentIds[] = $tmp;
+		return $tmp;
+	}
+	
+}
+
+?>
+

@@ -1,0 +1,80 @@
+<html>
+	<head>
+		<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>{{ source.preparedDocuments.preparedDocument[0].publisherResponse.document.name }}</title>
+	</head>
+	<body>
+	<table><tr>
+	<td valign="top" align="left" width="80%">
+	<div>
+	{% if not source.availableVariants.availableVariant is empty $}
+		Document variants:
+		<ul>
+			{% for variant in source.availableVariants %}
+				<li>
+					<a href="{{ variant.href }}">{{ variant.branchName }} - {{ variant.languageName }}</a>
+				</li>
+			{% end for %}
+		</ul>
+	{% end if %}
+	
+	{% for body in documentBody %}
+		{{ body }}
+	{% end for %}
+	
+	{$ if not source.versions is empty %}
+		<table cellspacing="2" cellpadding="2">
+		<thead>Versions:</thead>
+		<tr>
+			<td>Id</td>
+			<td>modified</td>
+			<td>creator</td>
+			<td>state</td>
+			<td bgcolor="white"> </td>
+		</tr>
+		{% for version in source.versions.version %}
+			<tr bgcolor="yellow">
+				<td>{{ version.id }}</td>
+				<td>{{ version.stateLastModifiedFormatted }}</td>
+				<td>{{ version.creatorDisplayName }}</td>
+				<td>{{ version.state }}</td>
+				{% if version.live %}
+					<td bgcolor="red">live</td>
+				{% else %}
+					<td bgcolor="white"> </td>
+				{% end if %}
+			</tr>
+		{% end for %}
+		</table>
+	{% end if %}
+	
+	<hr border="3" />
+	Comments:<br />
+	{% for comment in source.comments.comment %}
+		On {{ comment.createdOnFormatted }}
+		<strong>{{ comment.createdByDisplayName }}</strong> said:<br />
+		{{ comment.content }}
+		<br /><br />
+	{% end for %}
+	
+	</td><td width="20%" valign="top" align="left">
+	
+	{% if not source.navigationTree is empty %}
+		<ul style="square">
+		{% if source.navigationTree.doc.selected %}
+			{$ set selectedId = source.navigationTree.doc.id %}
+		{% else %}
+			{% set selectedId = "0" %}
+		{% end if %}
+		{% for doc in source.navigationTree.group %}
+			{% if doc.selected or doc.id == selectedId %}
+				<li><b><a href="{{ doc.href }}">{{ doc.label }}</a></b></li>
+			{% else %}
+				<li><a href="{{ doc.href }}">{{ doc.label }}</a></li>
+			{% end if %}
+		{% end for %}
+		<ul>
+	{% end if %}
+	</td></tr></table>
+	</body>
+</html>

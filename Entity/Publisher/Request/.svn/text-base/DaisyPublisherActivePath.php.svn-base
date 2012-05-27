@@ -1,0 +1,17 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+
+class DaisyPublisherActivePath extends DaisyXMLNode {
+	
+	public function __construct(DOMElement & $node, $path = '') {
+		parent::__construct($node, "p:activePath", PUBLISHER_NAMESPACE);
+		if (!empty($path)) $this->setValue($path);
+	}
+	
+	public function setValue($path) {
+		parent::setValue($path);
+	}
+	
+}
+?>

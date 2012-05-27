@@ -1,0 +1,28 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherOtherDocument.php';
+
+class DaisyPublisherDiff extends DaisyXMLNode {
+	public $otherDocument = null;
+	
+	public function __construct(DOMElement & $node) {
+		parent::__construct($node, "p:diff", PUBLISHER_NAMESPACE);
+	}
+	
+	public function addOtherDocument($id = '', $branch = '', $language = '', $version = '') {
+		if (!is_null($this->otherDocument)) {
+			$this->otherDocument->id = $id;
+			$this->otherDocument->branch = $branch;
+			$this->otherDocument->language = $language;
+			$this->otherDocument->version = $version;
+			return $this->otherDocument;
+		}
+		else {
+			 $this->otherDocument = new DaisyPublisherotherDocument($this->node, $id, $branch, $language, $version);
+			 return $this->otherDocument;
+		}
+	}
+}
+
+?>

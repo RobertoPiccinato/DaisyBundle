@@ -1,0 +1,102 @@
+<?php
+
+namespace Casagrande\DaisyBundle\Entity\Response;
+
+use Casagrande\DaisyBundle\Entity\Exceptions\EDaisyEmptyArgumentSupplied;
+
+class DaisyPublisherResponseTemplateProcessor{
+	private $tags;
+	private $response;
+	private $templateEngine;
+	private $output;
+		
+	public function __construct(\SimpleXMLElement $response = null, IDaisyPublisherResponseTemplate $templateEngine = null) {
+		if (!is_null($response)) $this->setResponse($response);
+		if (!is_null($templateEngine)) $this->setTemplateEngine($templateEngine);
+		$this->clearTags();
+	}
+	
+	public function setResponse(\SimpleXMLElement $response) {
+		if (empty($response)) throw new EDaisyEmptyArgumentSupplied(array('response'));
+		$this->response = $response;
+		$this->output = array();
+	}
+	
+	public function getResponse() {
+		return $this->output;
+	}
+	
+	public function setTemplateEngine(IDaisyPublisherResponseTemplate $templateEngine) {
+		if (empty($templateEngine)) throw new EDaisyEmptyArgumentSupplied(array('templateEngine'));
+		$this->templateEngine = $templateEngine;
+	}
+		
+	public function setTagTemplate($tagName, $template, $attributes = array(), $customVars = array(), $customTemplates = array()) {
+		if (empty($tagName)) throw new EDaisyEmptyArgumentSupplied(array('tagName'));
+		if (empty($template) && empty($customTemplates)) throw new EDaisyEmptyArgumentSupplied(array('template', 'customTemplates'));
+		$this->tags[$tagName]['template'] = $template;
+		$this->tags[$tagName]['attributes'] = $attributes;
+		$this->tags[$tagName]['customVars'] = $customVars;
+		if ((!empty($customTemplates)) && empty($customTemplates['tag']))
+			$customTemplates['tag'] = 'self::node()';
+		$this->tags[$tagName]['customTemplates'] = $customTemplates;
+	}
+	
+	public function clearTags() {
+		$this->tags = array();		
+	}
+		
+	public function process() {
+		$this->output = array();
+		foreach ($this->tags as $tagName => $parameters) {			
+			$tags = $this->response->xpath('.//'.$tagName);
+			
+			if (empty($parameters['customTemplates']))
+				$this->templateEngine->setTemplate($parameters['template']);			
+			
+			foreach ($parameters['customVars'] as $var)
+					$this->templateEngine->setCustomVariable($var['name'], $var['value'], $var['reference']);
+			
+			$this->output[$tagName] = array();
+			foreach ($tags as $tag) {
+				$this->templateEngine->setSource($tag);
+								
+				if (!empty($parameters['customTemplates'])) {
+					$customTag = $tag->xpath('.//'.$parameters['customTemplates']['tag']);
+					if (empty($customTag)) {
+						$this->templateEngine->setTemplate($parameters['template']);
+					}
+					else {
+						if (!isset($customTag[0][$parameters['customTemplates']['attributeName']])) {
+							$this->templateEngine->setTemplate($parameters['template']);
+						}
+						else {
+							$attribute = $customTag[0][$parameters['customTemplates']['attributeName']];
+							$template = '';
+							foreach ($parameters['customTemplates']['templates'] as $attributeValue => $templateName)
+								if ($attribute == $attributeValue) {
+									$template = $templateName;
+									break;
+								}
+							if (empty($template)) $this->templateEngine->setTemplate($parameters['template']);
+							else $this->templateEngine->setTemplate($template);
+						}
+					}
+				}
+				
+				$processedTag = array();
+				$processedTag['template'] = $this->templateEngine->process();
+
+				$processedTag['attributes'] = array();
+				foreach($parameters['attributes'] as $attribute)
+					if (isset($tag[$attribute]))
+						$processedTag['attributes'][$attribute] = (string) $tag[$attribute];
+				
+				$this->output[$tagName][] = $processedTag;
+			}
+		}
+		return $this->output;
+	}
+}
+
+?>

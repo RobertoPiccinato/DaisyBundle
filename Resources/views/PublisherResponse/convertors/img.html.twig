@@ -1,0 +1,7 @@
+{% if originalImg is empty %}
+<img src="{{ src }}" title="{{ title }}" label="{{ title }}"/>
+{% else %}
+<a href="{{ originalImg }}">
+ <img src="{{ src }}" title="{{ title }} Click to enlarge!" label="{{ title }} Click to enlarge!"/>
+</a>
+{% endif %}

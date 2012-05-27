@@ -1,0 +1,7 @@
+parameters:
+#    casagrande_daisy.example.class: Casagrande\DaisyBundle\Example
+
+services:
+#    casagrande_daisy.example:
+#        class: %casagrande_daisy.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

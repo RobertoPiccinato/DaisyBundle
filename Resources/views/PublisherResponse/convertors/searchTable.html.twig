@@ -1,0 +1,16 @@
+<table border="1" cellspacing="2" cellpadding="2" boder-color="red" title="{{ source.executionInfo.query }}">
+<tr>
+{% for title in source.titles %}
+	<td>{{ title }}</td>
+{% end for %}
+<td> </td>
+</tr>
+{% for row in rows %}
+	<tr>
+	{% for cel in row %}
+		<td>{{ cel }}</td>
+	{% end for %}
+	<td><a href="http://localhost/DaisyLib/test.php?id={{ row.documentId }}&amp;branch={{ row.branchId }}&amp;language={{ row.languageId }}&amp;version=live">view</a></td>
+	</tr>
+{% end for %}
+</table>

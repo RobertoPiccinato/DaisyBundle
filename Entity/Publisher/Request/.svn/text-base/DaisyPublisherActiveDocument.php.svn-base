@@ -1,0 +1,22 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+
+class DaisyPublisherActiveDocument extends DaisyXMLNode {	
+	protected $attributes = array (
+								'id' => '',
+								'branch' => '',
+								'language' => ''
+							);
+							
+	public function __construct(DOMElement & $node, $id = '', $branch = '', $language = '') {
+		parent::__construct($node, "p:activeDocument", PUBLISHER_NAMESPACE);
+		
+		if (!empty($id)) $this->id = $id;
+		if (!empty($branch)) $this->branch = $branch;
+		if (!empty($language)) $this->language = $language;
+	}
+	
+}
+
+?>

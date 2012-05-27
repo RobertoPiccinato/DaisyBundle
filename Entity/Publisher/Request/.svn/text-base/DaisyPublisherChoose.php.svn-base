@@ -1,0 +1,32 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherWhen.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherOtherwise.php';
+
+class DaisyPublisherChoose extends DaisyXMLNode {	
+	public $when = array();
+	public $otherwise = null;
+	
+	public function __construct(DOMElement & $node) {
+		parent::__construct($node, "p:choose", PUBLISHER_NAMESPACE);
+	}
+	
+	public function addWhen($test = '') {		
+		 $tmp = new DaisyPublisherWhen($this->node, $test);
+		 $this->when[] = $tmp;
+		 return $tmp;
+	}
+	
+	public function addOtherwise() {
+		if (!is_null($this->otherwise)) {			
+			return $this->otherwise;
+		}
+		else {
+			 $this->otherwise = new DaisyPublisheOtherwise($this->node);
+			 return $this->otherwise;
+		}
+	}
+}
+
+?>

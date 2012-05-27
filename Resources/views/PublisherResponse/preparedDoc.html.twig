@@ -1,0 +1,11 @@
+<h1>{{ source.publisherResponse.document.name }}</h1>
+<b>Branch:</b> <i>{{ source.publisherResponse.document.branch }}</i>; <b>Language:</b> <i>{{ source.publisherResponse.document.language }}</i>; <b>Data Version:</b> <i>{{ source.publisherResponse.document.dataVersionId }}</i><br />
+{% for part in source.publisherResponse.document.parts %}
+	{{ part.html }}
+{% end for %}
+<hr />
+
+<b>Document Links:</b><br />
+{% for link in source.publisherResponse.document.links %}
+	<a href={{ link.target }}>{{ link.title }}</a><br />
+{% end for %}

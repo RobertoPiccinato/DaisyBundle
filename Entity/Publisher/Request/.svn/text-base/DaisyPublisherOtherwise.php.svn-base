@@ -1,0 +1,12 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'ADaisyPublisherAllRequests.php';
+
+class DaisyPublisherOtherwise extends ADaisyPublisherAllRequests {
+	
+	public function __construct(DOMElement & $node) {
+		parent::__construct($node, "p:otherwise", PUBLISHER_NAMESPACE);
+	}
+		
+}
+?>

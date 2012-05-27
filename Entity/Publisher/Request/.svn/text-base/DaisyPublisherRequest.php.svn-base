@@ -1,0 +1,59 @@
+<?php
+
+require_once CLASS_PATH.'DaisyHTTPClient.php';
+require_once CLASS_PATH.'DaisyUser.php';
+require_once PUBLISHER_REQUEST_PATH_BASE.'ADaisyPublisherAllRequests.php';
+
+class DaisyPublisherRequest extends ADaisyPublisherAllRequests {
+	public $xmlns = PUBLISHER_NAMESPACE;
+	protected $attributes = array (
+								'locale' => '',
+								'exceptions' => '',
+							);
+	private $user;
+	private $request;
+	private $response; 
+	
+	public function __construct(DaisyUser $user, $xmlns = '') {
+		$this->clearRequest($xmlns);
+		$this->user = $user;		
+	}
+	
+	public function clearRequest($xmlns = '') {
+		if (!empty($xmlns)) $this->xmlns = $xmlns;
+		
+		$requestStr = '<p:publisherRequest '.
+						'xmlns:p="'.$this->xmlns.'" '.
+						'locale="'.PUBLISHER_DEFAULT_LOCALE.'" '.
+						'exceptions="'.PUBLISHER_DEFAULT_EXCEPTIONS.'">'.
+						'</p:publisherRequest>';
+		
+		if (!empty($this->request)) unset($this->request);
+		
+		$this->request =& new DOMDocument();
+		$this->request->loadXML($requestStr);		
+		$this->init($this->request->documentElement);
+		
+		$this->locale = 'en-US';
+		$this->exceptions = 'throw';
+	}
+		
+	public function sendRequest() {
+		$client =& DaisyHTTPClient::singleton();		
+		$client->connect();
+		$client->setUser($this->user);
+		$client->setPostMethod();
+		$client->setPath('/publisher/request');				
+		$client->sendToHost($this->request->saveXML());
+		$this->response = $client->getResultData();
+//		file_put_contents('test.xml', $client->getResultData());
+//		file_put_contents('test1.xml', $this->request->saveXML());		
+	}
+	
+	public function getResponse() {
+		return $this->response;
+	}	
+	
+}
+
+?>

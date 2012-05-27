@@ -1,0 +1,39 @@
+<?php
+
+require_once PUBLISHER_REQUEST_PATH_BASE.'DaisyXMLNode.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherQuery.php';
+require_once PUBLISHER_REQUEST_PATH.'DaisyPublisherExtraConditions.php';
+
+class DaisyPublisherPerformQuery extends DaisyXMLNode {	
+	public $query = null;
+	public $extraConditions = null;
+	
+	public function __construct(DOMElement & $node, $query = '') {
+		parent::__construct($node, "p:performQuery", PUBLISHER_NAMESPACE);
+		$this->addQuery($query);
+	}
+	
+	public function addQuery($value = '') {
+		if (!is_null($this->query)) {
+			$this->query->setValue($value);
+			return $this->query;
+		}
+		else {
+			 $this->query = new DaisyPublisherQuery($this->node, $value);
+			 return $this->query;
+		}
+	}
+	
+	public function addExtraConditions($value = '') {
+		if (!is_null($this->extraConditions)) {
+			$this->extraConditions->setValue($value);
+			return $this->extraConditions;
+		}
+		else {
+			 $this->extraConditions = new DaisyPublisheExtraConditions($this->node, $value);
+			 return $this->extraConditions;
+		}
+	}
+}
+
+?>
