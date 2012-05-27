@@ -112,11 +112,13 @@ class Document extends ARepositoryItem {
 					}
 					break;
 				case 'newChangeType':
-					if($attrNode->nodeValue == 'major') {
-						$document->setNewChangeType(ChangeType:MAJOR)
-					}
-					elseif($attrNode->nodeValue == 'minor') {
-						$document->setNewChangeType(ChangeType:MINOR)
+					switch($attrNode->nodeValue) {
+    	                case 'major': 
+						    $document->setNewChangeType(ChangeType:MAJOR);
+                            break;
+                        case 'minor':
+						    $document->setNewChangeType(ChangeType:MINOR);
+                            break;
 					}
 					break;
 				case 'newLiveStrategy':
