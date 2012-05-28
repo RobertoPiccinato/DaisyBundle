@@ -170,60 +170,50 @@ class Document extends ARepositoryItem {
 					$document->setSummary($child->nodeValue);
 					break;
 				case 'lockInfo':
-					$document->setLockInfo(LockInfo::getFromDom(Child));
+					$document->setLockInfo(LockInfo::getFromDom($child));
 					break;
 				case 'timeline':
-					$document->setTimeline(Timeline::getFromDom(Child));
+					$document->setTimeline(Timeline::getFromDom($child));
 					break;
 			}
 		}
-		
-		$customFields = $dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'customField');
 
-		foreach($customFields as $customField) {
+		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'customField') as $customField) {
 			
-			$customFields[] = CustomField::getFromDom($customField);
+			$document->addCustomField(CustomField::getFromDom($customField));
 		}
-		
-		$document->setCustomFields($customFields);
-		
-		$collectionIds = $dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'collectionId');
 
-		foreach($collectionIds as $collectionId) {
+		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'collectionId') as $collectionId) {
 			
-			$collectionIds[] = $collectionId;
+			$document->addCollectionId($collectionId->getValue());
 		}
-		
-		$document->setCollectionIds($collectionIds);
-		
-		$fields = $dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'field');
 
-		foreach($fields as $field) {
+		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'field') as $field) {
 			
-			$fields[] = Field::getFromDom($field);
+			$document->addField(Field::getFromDom($field));
 		}
-		
-		$document->setFields($fields);
-		
-		$parts = $dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'part');
 
-		foreach($parts as $part) {
+		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'part') as $part) {
 			
-			$parts[] = Part::getFromDom($part);
+			$document->addPart(Part::getFromDom($part));
 		}
-		
-		$document->setParts($parts);
-		
-		$links = $dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'link');
 
-		foreach($links as $link) {
+		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'link') as $link) {
 			
-			$links[] = Link::getFromDom($link);
+			$document->addLink(Link::getFromDom($link));
 		}
-		
-		$document->setLinks($links);
 		
 		return $document;
+	}
+	
+	
+	public function __construct() {
+
+	    $this->customFields = array();
+	    $this->collectionIds = array();
+	    $this->fields = array();
+	    $this->parts = array();
+	    $this->links = array();
 	}
 	
 	public function getId() {
