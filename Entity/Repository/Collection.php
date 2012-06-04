@@ -11,8 +11,6 @@ class Collection extends ARepositoryItem {
 	private $updateCount;			// integer
 	
 	/**
-	 * 
-	 * Enter description here ...
 	 * @param string(integer) $id
 	 * @param Repository $repository
 	 */
@@ -80,7 +78,7 @@ class Collection extends ARepositoryItem {
 		return $collections;
 	}
 
-	public static function getCollectionByName($name, $repository) {
+	public static function getByName($name, $repository) {
     	
 		$repository->sendGet('/repository/collectionByName/' . $name);
 		

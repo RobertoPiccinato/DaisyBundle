@@ -2,22 +2,27 @@
 
 namespace Casagrande\DaisyBundle\Entity\Repository\Schema;
 
+use Casagrande\DaisyBundle\Entity\DaisyUtil;
 use Casagrande\DaisyBundle\Entity\Repository\ARepositoryItem;
 use Casagrande\DaisyBundle\Entity\Repository\Repository;
 
-class PartType extends ARepositoryItem {
+class FieldType extends ARepositoryItem {
 	
-	protected $name;				// string
-	protected $mimeTypes;           // string
-	protected $daisyHtml;           // boolean
-	protected $linkExtractor;       // string
-	protected $deprecated;          // boolean
-	protected $updateCount;			// integer
-	protected $id;					// integer
-	protected $lastModified;		// \DateTime
-	protected $lastModifierId; 		// integer
-	protected $labels;              // array
-	protected $descriptions;        // array
+	protected $id;					    // integer
+	protected $lastModified;		    // \DateTime
+	protected $lastModifierId; 		    // integer
+	protected $name;				    // string
+	protected $valueType;               // string
+	protected $multivalue;              // boolean
+	protected $hierarchical;            // boolean
+	protected $deprecated;              // boolean
+	protected $aclAllowed;              // boolean
+	protected $updateCount;			    // integer
+	protected $size;       			    // integer
+	protected $allowFreeEntry;          // boolean
+	protected $loadSelectionListAsync;  // boolean
+	protected $labels;                  // array
+	protected $descriptions;            // array
 
 		
 	public function __construct() {
@@ -33,7 +38,7 @@ class PartType extends ARepositoryItem {
 	 */
 	public static function get($id, Repository $repository) {
     	
-		$repository->sendGet('/repository/schema/partType/' . $id);
+		$repository->sendGet('/repository/schema/fieldType/' . $id);
 		
 		return self::getFromDom($repository->getResponse());
 	}
@@ -44,64 +49,76 @@ class PartType extends ARepositoryItem {
 	 */
 	public static function getByName($name, Repository $repository) {
     	
-		$repository->sendGet('/repository/schema/partTypeByName/' . $name);
+		$repository->sendGet('/repository/schema/fieldTypeByName/' . $name);
 		
 		return self::getFromDom($repository->getResponse());
 	}
 	
 	/**
 	 * @param \DomDocument $dom
-	 * @return Branch
+	 * @return FieldType
 	 */
 	public static function getFromDom($dom) {
 		
-		$partType = new PartType();
+		$fieldType = new FieldType();
 		
 		foreach($dom->documentElement->attributes as $attrName -> $attrNode) {
 			
 			switch($attrName) {
 				
-				case 'name':
-					$partType->setName($attrNode->nodeValue);
-					break;
-				case 'mimeTypes':
-					$partType->setMimeTypes($attrNode->nodeValue);
-					break;
-				case 'daisyHtml':
-					$partType->setDaisyHtml($attrNode->nodeValue);
-					break;
-				case 'linkExtractor':
-					$partType->setLinkExtractor($attrNode->nodeValue);
-					break;
-				case 'deprecated':
-					$partType->setDeprecated($attrNode->nodeValue);
-					break;
-				case 'updateCount':
-					$partType->setId($attrNode->nodeValue);
-					break;
 				case 'id':
-					$partType->setId($attrNode->nodeValue);
+					$fieldType->setId($attrNode->nodeValue);
 					break;
 				case 'lastModified':
-					$partType->setLastModified($attrNode->nodeValue);
+					$fieldType->setLastModified($attrNode->nodeValue);
 					break;
 				case 'lastModifier':
-					$partType->setLastModifierId($attrNode->nodeValue);
+					$fieldType->setLastModifierId($attrNode->nodeValue);
+					break;
+				case 'name':
+					$fieldType->setName($attrNode->nodeValue);
+					break;
+				case 'valueType':
+					$fieldType->setValueType($attrNode->nodeValue);
+					break;
+				case 'multivalue':
+					$fieldType->setMultivalue($attrNode->nodeValue);
+					break;
+				case 'hierarchical':
+					$fieldType->setHierarchical($attrNode->nodeValue);
+					break;
+				case 'deprecated':
+					$fieldType->setDeprecated($attrNode->nodeValue);
+					break;
+				case 'aclAllowed':
+					$fieldType->setAclAllowed($attrNode->nodeValue);
+					break;
+				case 'updateCount':
+					$fieldType->setId($attrNode->nodeValue);
+					break;
+				case 'size':
+					$fieldType->setSize($attrNode->nodeValue);
+					break;
+				case 'allowFreeEntry':
+					$fieldType->setAllowFreeEntry($attrNode->nodeValue);
+					break;
+				case 'loadSelectionListAsync':
+					$fieldType->setLoadSelectionListAsync($attrNode->nodeValue);
 					break;
 			}
 		}
 		
 		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'label') as $label) {
 			
-			$partType->labels[] = Label::getFromDom($label);
+			$fieldType->labels[] = Label::getFromDom($label);
 		}
 		
 		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'description') as $description) {
 			
-			$partType->descriptions[] = Description::getFromDom($description);
+			$fieldType->descriptions[] = Description::getFromDom($description);
 		}
 		
-		return $partType;
+		return $fieldType;
 	}
 	
 	public function getId() {
@@ -135,6 +152,20 @@ class PartType extends ARepositoryItem {
 		$this->lastModifierId = $lastModifierId;
 	}
 	
+	public function getValueType() {
+		return $this->valueType;
+	}
+	public function setValueType($valueType) {
+		$this->valueType = $valueType;
+	}
+	
+	public function getHierarchical() {
+		return $this->hierarchical;
+	}
+	public function setHierarchical($hierarchical) {
+	    $this->hierarchical = DaisyUtil::parseBoolean($hierarchical);
+	}
+	
 	public function getDeprecated() {
 		return $this->deprecated;
 	}
@@ -142,11 +173,11 @@ class PartType extends ARepositoryItem {
 	    $this->deprecated = DaisyUtil::parseBoolean($deprecated);
 	}
 	
-	public function getLinkExtractor() {
-		return $this->linkExtractor;
+	public function getAclAllowed() {
+		return $this->aclAllowed;
 	}
-	public function setLinkExtractor($linkExtractor) {
-	    $this->linkExtractor = $linkExtractor;
+	public function setAclAllowed($aclAllowed) {
+	    $this->aclAllowed = DaisyUtil::parseBoolean($aclAllowed);
 	}
 	
 	public function getUpdateCount() {
@@ -154,6 +185,34 @@ class PartType extends ARepositoryItem {
 	}
 	public function setUpdateCount($updateCount) {
 	    $this->updateCount = $updateCount;
+	}
+	
+	public function getSize() {
+		return $this->size;
+	}
+	public function setSize($size) {
+	    $this->size = $size;
+	}
+	
+	public function getMultivalue() {
+		return $this->multivalue;
+	}
+	public function setMultivalue($multivalue) {
+	    $this->multivalue = DaisyUtil::parseBoolean($multivalue);
+	}
+	
+	public function getAllowFreeEntry() {
+		return $this->allowFreeEntry;
+	}
+	public function setAllowFreeEntry($allowFreeEntry) {
+	    $this->allowFreeEntry = DaisyUtil::parseBoolean($allowFreeEntry);
+	}
+	
+	public function getLoadSelectionListAsync() {
+		return $this->loadSelectionListAsync;
+	}
+	public function setLoadSelectionListAsync($loadSelectionListAsync) {
+	    $this->loadSelectionListAsync = DaisyUtil::parseBoolean($loadSelectionListAsync);
 	}
 	
 	public function addLabel(Label $label) {

@@ -5,12 +5,9 @@ namespace Casagrande\DaisyBundle\Entity\Repository\Schema;
 use Casagrande\DaisyBundle\Entity\Repository\ARepositoryItem;
 use Casagrande\DaisyBundle\Entity\Repository\Repository;
 
-class PartType extends ARepositoryItem {
+class DocumentType extends ARepositoryItem {
 	
 	protected $name;				// string
-	protected $mimeTypes;           // string
-	protected $daisyHtml;           // boolean
-	protected $linkExtractor;       // string
 	protected $deprecated;          // boolean
 	protected $updateCount;			// integer
 	protected $id;					// integer
@@ -33,7 +30,7 @@ class PartType extends ARepositoryItem {
 	 */
 	public static function get($id, Repository $repository) {
     	
-		$repository->sendGet('/repository/schema/partType/' . $id);
+		$repository->sendGet('/repository/schema/documentType/' . $id);
 		
 		return self::getFromDom($repository->getResponse());
 	}
@@ -44,64 +41,55 @@ class PartType extends ARepositoryItem {
 	 */
 	public static function getByName($name, Repository $repository) {
     	
-		$repository->sendGet('/repository/schema/partTypeByName/' . $name);
+		$repository->sendGet('/repository/schema/documentTypeByName/' . $name);
 		
 		return self::getFromDom($repository->getResponse());
 	}
 	
 	/**
 	 * @param \DomDocument $dom
-	 * @return Branch
+	 * @return DocumentType
 	 */
 	public static function getFromDom($dom) {
 		
-		$partType = new PartType();
+		$documentType = new DocumentType();
 		
 		foreach($dom->documentElement->attributes as $attrName -> $attrNode) {
 			
 			switch($attrName) {
 				
 				case 'name':
-					$partType->setName($attrNode->nodeValue);
-					break;
-				case 'mimeTypes':
-					$partType->setMimeTypes($attrNode->nodeValue);
-					break;
-				case 'daisyHtml':
-					$partType->setDaisyHtml($attrNode->nodeValue);
-					break;
-				case 'linkExtractor':
-					$partType->setLinkExtractor($attrNode->nodeValue);
+					$documentType->setName($attrNode->nodeValue);
 					break;
 				case 'deprecated':
-					$partType->setDeprecated($attrNode->nodeValue);
+					$documentType->setDeprecated($attrNode->nodeValue);
 					break;
 				case 'updateCount':
-					$partType->setId($attrNode->nodeValue);
+					$documentType->setId($attrNode->nodeValue);
 					break;
 				case 'id':
-					$partType->setId($attrNode->nodeValue);
+					$documentType->setId($attrNode->nodeValue);
 					break;
 				case 'lastModified':
-					$partType->setLastModified($attrNode->nodeValue);
+					$documentType->setLastModified($attrNode->nodeValue);
 					break;
 				case 'lastModifier':
-					$partType->setLastModifierId($attrNode->nodeValue);
+					$documentType->setLastModifierId($attrNode->nodeValue);
 					break;
 			}
 		}
 		
 		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'label') as $label) {
 			
-			$partType->labels[] = Label::getFromDom($label);
+			$documentType->labels[] = Label::getFromDom($label);
 		}
 		
 		foreach($dom->getElementsByTagNameNS(DOCUMENT_NAMESPACE, 'description') as $description) {
 			
-			$partType->descriptions[] = Description::getFromDom($description);
+			$documentType->descriptions[] = Description::getFromDom($description);
 		}
 		
-		return $partType;
+		return $documentType;
 	}
 	
 	public function getId() {
@@ -140,20 +128,6 @@ class PartType extends ARepositoryItem {
 	}
 	public function setDeprecated($deprecated) {
 	    $this->deprecated = DaisyUtil::parseBoolean($deprecated);
-	}
-	
-	public function getLinkExtractor() {
-		return $this->linkExtractor;
-	}
-	public function setLinkExtractor($linkExtractor) {
-	    $this->linkExtractor = $linkExtractor;
-	}
-	
-	public function getUpdateCount() {
-		return $this->updateCount;
-	}
-	public function setUpdateCount($updateCount) {
-	    $this->updateCount = $updateCount;
 	}
 	
 	public function addLabel(Label $label) {
