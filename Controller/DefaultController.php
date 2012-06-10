@@ -8,7 +8,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Casagrande\DaisyBundle\Entity\DaisyUser;
 use Casagrande\DaisyBundle\Entity\DaisyHTTPClient;
 use Casagrande\DaisyBundle\Entity\Repository\Repository;
-use Casagrande\DaisyBundle\Entity\Repository\User;
+
+use Casagrande\DaisyBundle\Entity\Repository\User\Role;
 
 use Casagrande\DaisyBundle\Entity\Publisher\Request\DaisyPublisherRequest;
 use Casagrande\DaisyBundle\Entity\Publisher\Response\DaisyPublisherResponsePreparedDocuments;
@@ -125,12 +126,11 @@ class DefaultController extends Controller
     	
     	$casUser = new DaisyUser('testuser', 'testuser');
     	
-    	$daisyRepository = new Repository($casUser);
+    	$repository = new Repository($casUser);
     	
-    	$daisyRepository->sendGet('/repository/userIds');
+    	$role = Role::get(1, $repository);
     	
-    	$response = new Response();
-		$response->setContent($daisyRepository->getResponse());
+    	$response = new Response($role->getXml());
 		$response->headers->set('Content-Type', 'text/xml');
 		
 		return $response;

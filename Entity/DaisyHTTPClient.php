@@ -66,7 +66,7 @@ namespace Casagrande\DaisyBundle\Entity;
 	    if ($this->method == 'GET') $path .= '?' . $data;
 	    
 	    $header  = $this->method." ".$this->path." HTTP/1.1\r\n";
-	    $header .= "Host: ".$this->host."\r\n";
+	    $header .= 'Host: ' . $this->host . ':' . $this->port . "\r\n";
 		$header .= "Content-type: text/xml; charset=UTF-8\r\n";
 	    if ($this->method == "POST") $header .= "Content-length: ".strlen($data)."\r\n";
 	    $header .= "Authorization: Basic ".base64_encode($this->user->getUser().":".$this->user->getPasswd())."\r\n";
